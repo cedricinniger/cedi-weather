@@ -27,10 +27,11 @@
 </head>
 <body>
     <h1>Cedi's Weather</h1>
-    <iframe 
+    <iframe
         width="450" height="260" style="border: 1px solid #cccccc;"
-        src="https://thingspeak.com/channels/2787015/charts/1?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15">
+        src="https://thingspeak.com/channels/2787015/charts/1?bgcolor=%23ffffff&color=%23d62020&days=1&dynamic=true&results=10&type=line">
         </iframe>
+
 
 
     <footer>
