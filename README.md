@@ -22,8 +22,8 @@
         <input type="number" id="Qp" step="any">
         <label for="Vo">Vo:</label>
         <input type="number" id="Vo" step="any">
-        <label for="wc">ωc (rad/s):</label>
-        <input type="number" id="wc" step="any">
+        <label for="fc">Grenzfrequenz fc (Hz):</label>
+        <input type="number" id="fc" step="any">
         <button onclick="berechneTiefpass()">Berechnen</button>
         <p id="ergebnisTiefpass"></p>
         
@@ -32,8 +32,8 @@
         <input type="number" id="C" step="any">
         <label for="QpHP">Qp (HP):</label>
         <input type="number" id="QpHP" step="any">
-        <label for="OmegaHP">Ωp (HP):</label>
-        <input type="number" id="OmegaHP" step="any">
+        <label for="fp">Grenzfrequenz fp (Hz):</label>
+        <input type="number" id="fp" step="any">
         <button onclick="berechneHochpass()">Berechnen</button>
         <p id="ergebnisHochpass"></p>
     </div>
@@ -44,7 +44,8 @@
             let C5 = parseFloat(document.getElementById('C5').value);
             let Qp = parseFloat(document.getElementById('Qp').value);
             let Vo = parseFloat(document.getElementById('Vo').value);
-            let wc = parseFloat(document.getElementById('wc').value);
+            let fc = parseFloat(document.getElementById('fc').value);
+            let wc = 2 * Math.PI * fc;
             
             let R2 = C3 / (2 * C3 * C5 * Qp * wc);
             let R1 = R2 / Math.abs(Vo);
@@ -56,10 +57,11 @@
         function berechneHochpass() {
             let C = parseFloat(document.getElementById('C').value);
             let QpHP = parseFloat(document.getElementById('QpHP').value);
-            let OmegaHP = parseFloat(document.getElementById('OmegaHP').value);
+            let fp = parseFloat(document.getElementById('fp').value);
+            let Omegap = 2 * Math.PI * fp;
             
-            let R3 = 1 / (3 * OmegaHP * QpHP * C);
-            let R5 = (3 * QpHP) / (OmegaHP * C);
+            let R3 = 1 / (3 * Omegap * QpHP * C);
+            let R5 = (3 * QpHP) / (Omegap * C);
             
             document.getElementById('ergebnisHochpass').innerText = `R3 = ${R3.toFixed(4)} Ω, R5 = ${R5.toFixed(4)} Ω`;
         }
