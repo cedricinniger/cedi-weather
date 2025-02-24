@@ -1,82 +1,68 @@
+<!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cedi's Weather</title>
+    <title>Filterberechnung</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            text-align: center;
-            padding: 20px;
-        }
-        h1 {
-            color: #333;
-        }
-        iframe {
-            margin-top: 20px;
-            max-width: 100%;
-            border: 1px solid #cccccc;
-        }
-        .latest-value {
-            font-size: 18px;
-            color: #333;
-            margin-top: 20px;
-        }
-        footer {
-            margin-top: 30px;
-            font-size: 14px;
-            color: #555;
-        }
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 600px; margin: auto; }
+        label, input, button { display: block; margin-top: 10px; }
+        input { padding: 5px; width: 100%; }
     </style>
 </head>
 <body>
-    <h1>Cedi's Weather</h1>
-    <div class="latest-value">
-        <strong>Letzter Wert:</strong> 
-        <span id="latestValue">Laden...</span>
+    <div class="container">
+        <h2>Aktiver Tiefpass</h2>
+        <label for="C3">C3 (F):</label>
+        <input type="number" id="C3" step="any">
+        <label for="C5">C5 (F):</label>
+        <input type="number" id="C5" step="any">
+        <label for="Qp">Qp:</label>
+        <input type="number" id="Qp" step="any">
+        <label for="Vo">Vo:</label>
+        <input type="number" id="Vo" step="any">
+        <label for="wc">ωc (rad/s):</label>
+        <input type="number" id="wc" step="any">
+        <button onclick="berechneTiefpass()">Berechnen</button>
+        <p id="ergebnisTiefpass"></p>
+        
+        <h2>Aktiver Hochpass</h2>
+        <label for="C">C (F):</label>
+        <input type="number" id="C" step="any">
+        <label for="QpHP">Qp (HP):</label>
+        <input type="number" id="QpHP" step="any">
+        <label for="OmegaHP">Ωp (HP):</label>
+        <input type="number" id="OmegaHP" step="any">
+        <button onclick="berechneHochpass()">Berechnen</button>
+        <p id="ergebnisHochpass"></p>
     </div>
-    <iframe
-        width="450" height="260" style="border: 1px solid #cccccc;"
-        src="https://thingspeak.com/channels/2787015/charts/1?bgcolor=%23ffffff&color=%23d62020&days=1&dynamic=true&type=line">
-    </iframe>
-
-    <footer>
-        Cedric Inniger, <span id="currentDate"></span>
-    </footer>
 
     <script>
-        // Aktuelles Datum anzeigen
-        const currentDateElement = document.getElementById('currentDate');
-        const today = new Date();
-        const formattedDate = today.toLocaleDateString('de-DE');
-        currentDateElement.textContent = formattedDate;
-
-        // Letzten Wert von ThingSpeak abrufen
-        const apiKey = "YMO44T6QD7W3AON8"; // Ersetze durch deinen Read API Key (falls erforderlich)
-        const channelId = "2787015"; // Channel-ID
-        const fieldNumber = "1"; // Feldnummer, aus dem die Daten abgerufen werden
-        const latestValueElement = document.getElementById('latestValue');
-
-        async function fetchLatestValue() {
-            try {
-                const url = `https://api.thingspeak.com/channels/${channelId}/fields/${fieldNumber}/last.json?api_key=${apiKey}`;
-                const response = await fetch(url);
-                if (response.ok) {
-                    const data = await response.json();
-                    const value = data.field1; // Aktuellen Wert abrufen
-                    latestValueElement.textContent = value + " °C"; // Wert anzeigen
-                } else {
-                    latestValueElement.textContent = "Fehler beim Abrufen der Daten.";
-                }
-            } catch (error) {
-                console.error("Fehler beim Abrufen der Daten:", error);
-                latestValueElement.textContent = "Fehler.";
-            }
+        function berechneTiefpass() {
+            let C3 = parseFloat(document.getElementById('C3').value);
+            let C5 = parseFloat(document.getElementById('C5').value);
+            let Qp = parseFloat(document.getElementById('Qp').value);
+            let Vo = parseFloat(document.getElementById('Vo').value);
+            let wc = parseFloat(document.getElementById('wc').value);
+            
+            let R2 = C3 / (2 * C3 * C5 * Qp * wc);
+            let R1 = R2 / Math.abs(Vo);
+            let R4 = 1 / (R2 * C3 * C5 * Qp * Qp * wc * wc);
+            
+            document.getElementById('ergebnisTiefpass').innerText = `R2 = ${R2.toFixed(4)} Ω, R1 = ${R1.toFixed(4)} Ω, R4 = ${R4.toFixed(4)} Ω`;
         }
 
-        // Abrufen des letzten Werts beim Laden der Seite
-        fetchLatestValue();
+        function berechneHochpass() {
+            let C = parseFloat(document.getElementById('C').value);
+            let QpHP = parseFloat(document.getElementById('QpHP').value);
+            let OmegaHP = parseFloat(document.getElementById('OmegaHP').value);
+            
+            let R3 = 1 / (3 * OmegaHP * QpHP * C);
+            let R5 = (3 * QpHP) / (OmegaHP * C);
+            
+            document.getElementById('ergebnisHochpass').innerText = `R3 = ${R3.toFixed(4)} Ω, R5 = ${R5.toFixed(4)} Ω`;
+        }
     </script>
 </body>
 </html>
